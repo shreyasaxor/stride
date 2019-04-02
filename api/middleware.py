@@ -47,6 +47,11 @@ from rest_framework.authtoken.models import Token
 #         return response
 #
 #     return middleware
+import datetime
+def get_time_diff(par):
+    now = datetime.datetime.now()
+    timediff = now - par
+    return timediff.total_seconds()
 
 
 class StrideMIddleware(object):
@@ -63,7 +68,10 @@ class StrideMIddleware(object):
             raise exceptions.AuthenticationFailed('No token')
         try:
             user = Token.objects.get(key=username)
-            if user.created :
+            if user.created and  get_time_diff(user.created) > 18000:
                 return None
+            else:
+                raise exceptions.AuthenticationFailed('token invalid')
+
         except User.DoesNotExist:
             raise exceptions.AuthenticationFailed('No such user')
